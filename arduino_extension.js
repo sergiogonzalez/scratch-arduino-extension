@@ -342,7 +342,7 @@
     device.send(msg.buffer);
   }
 
-  function rotateMotor(pin, deg) {
+  function rotateMotor(deg) {
     var paso1 = [1, 0, 0, 0];
     var paso2 = [1, 1, 0, 0];
     var paso3 = [0, 1, 0, 0];
@@ -427,12 +427,9 @@
   };
 
   ext.rotateMotor = function(motor, deg) {
-    var hw = hwList.search(motor);
-    if (!hw) return;
     if (deg < 0) deg = 0;
     else if (deg > 180) deg = 180;
-    rotateMotor(hw.pin, deg);
-    hw.val = deg;
+    rotateMotor(deg);
   };
 
   ext.changeServo = function(servo, change) {
