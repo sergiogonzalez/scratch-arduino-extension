@@ -342,6 +342,31 @@
     device.send(msg.buffer);
   }
 
+  function rotateMotor(pin, deg) {
+    var paso1 = [1, 0, 0, 0];
+    var paso2 = [1, 1, 0, 0];
+    var paso3 = [0, 1, 0, 0];
+    var paso4 = [0, 1, 1, 0];
+    var paso5 = [0, 0, 1, 0];
+    var paso6 = [0, 0, 1, 1];
+    var paso7 = [0, 0, 0, 1];
+    var paso8 = [1, 0, 0, 1];
+
+    var pasos = [paso1, paso2, paso3, paso4, paso5, paso6, paso7, paso8];
+
+    var step = deg * 4095 / 360;
+
+    for (int j = 0; j < step; j++) {
+      for (int i = 0; i < 8; i++) {
+        digitalWrite(8, pasos[i][0]);
+        digitalWrite(9, pasos[i][1]);
+        digitalWrite(10, pasos[i][2]);
+        digitalWrite(11, pasos[i][3]);
+        delay(10);
+      }
+    } 
+  }
+
   ext.whenConnected = function() {
     if (notifyConnection) return true;
     return false;
@@ -398,6 +423,15 @@
     if (deg < 0) deg = 0;
     else if (deg > 180) deg = 180;
     rotateServo(hw.pin, deg);
+    hw.val = deg;
+  };
+
+  ext.rotateMotor = function(motor, deg) {
+    var hw = hwList.search(motor);
+    if (!hw) return;
+    if (deg < 0) deg = 0;
+    else if (deg > 180) deg = 180;
+    rotateMotor(hw.pin, deg);
     hw.val = deg;
   };
 
@@ -555,6 +589,8 @@
       [' ', 'rotate %m.servos to %n degrees', 'rotateServo', 'servo A', 180],
       [' ', 'rotate %m.servos by %n degrees', 'changeServo', 'servo A', 20],
       ['-'],
+      [' ', 'rotate %m.motors to %n degrees', 'rotateMotor', 'motor A', 180],
+      ['-'],
       ['h', 'when %m.buttons is %m.btnStates', 'whenButton', 'button A', 'pressed'],
       ['b', '%m.buttons pressed?', 'isButtonPressed', 'button A'],
       ['-'],
@@ -583,6 +619,8 @@
       ['-'],
       [' ', 'Drehe %m.servos auf %n Grad', 'rotateServo', 'Servo A', 180],
       [' ', 'Drehe %m.servos um %n Grad', 'changeServo', 'Servo A', 20],
+      ['-'],
+      [' ', 'rotate %m.motors to %n degrees', 'rotateMotor', 'motor A', 180],
       ['-'],
       ['h', 'Wenn %m.buttons ist %m.btnStates', 'whenButton', 'Taste A', 'gedrückt'],
       ['b', '%m.buttons gedrückt?', 'isButtonPressed', 'Taste A'],
@@ -613,6 +651,8 @@
       [' ', 'Tourner %m.servos Servo Moteur à %n degrés', 'rotateServo', 'Servo Moteur A', 180],
       [' ', 'Tourner %m.servos Servo Moteur de %n degrés', 'changeServo', 'Servo Moteur A', 20],
       ['-'],
+      [' ', 'rotate %m.motors to %n degrees', 'rotateMotor', 'motor A', 180],
+      ['-'],
       ['h', 'Quand %m.buttons Bouton est %m.btnStates', 'whenButton', 'Bouton A', 'Appuyé'],
       ['b', 'Le %m.buttons est-il pressé?', 'isButtonPressed', 'Bouton A'],
       ['-'],
@@ -641,6 +681,8 @@
       ['-'],
       [' ', 'ruota %m.servos fino a %n gradi', 'rotateServo', 'servo A', 180],
       [' ', 'ruota %m.servos di %n gradi', 'changeServo', 'servo A', 20],
+      ['-'],
+      [' ', 'rotate %m.motors to %n degrees', 'rotateMotor', 'motor A', 180],
       ['-'],
       ['h', 'quando tasto %m.buttons è %m.btnStates', 'whenButton', 'pulsante A', 'premuto'],
       ['b', '%m.buttons premuto?', 'isButtonPressed', 'pulsante A'],
@@ -671,6 +713,8 @@
       [' ', '%m.servos を %n 度へ向ける', 'rotateServo', 'servo A', 180],
       [' ', '%m.servos を %n 度ずつ回す', 'changeServo', 'servo A', 20],
       ['-'],
+      [' ', 'rotate %m.motors to %n degrees', 'rotateMotor', 'motor A', 180],
+      ['-'],
       ['h', '%m.buttons が %m.btnStates とき', 'whenButton', 'ボタン A', '押された'],
       ['b', '%m.buttons 押された', 'isButtonPressed', 'ボタン A'],
       ['-'],
@@ -699,6 +743,8 @@
       ['-'],
       [' ', '%m.servos 를 %n 도로 회전하기', 'rotateServo', '서보모터 A', 180],
       [' ', '%m.servos 를 %n 도 만큼 회전하기', 'changeServo', '서보모터 A', 20],
+      ['-'],
+      [' ', 'rotate %m.motors to %n degrees', 'rotateMotor', 'motor A', 180],
       ['-'],
       ['h', '%m.buttons 의 상태가 %m.btnStates 일 때', 'whenButton', '버튼 A', '눌림'],
       ['b', '%m.buttons 가 눌려져 있는가?', 'isButtonPressed', '버튼 A'],
@@ -729,6 +775,8 @@
       [' ', 'rotér %m.servos til %n grader', 'rotateServo', 'servo A', 180],
       [' ', 'rotér %m.servos med %n grader', 'changeServo', 'servo A', 20],
       ['-'],
+      [' ', 'rotate %m.motors to %n degrees', 'rotateMotor', 'motor A', 180],
+      ['-'],
       ['h', 'når %m.buttons %m.btnStates', 'whenButton', 'knapp A', 'trykkes'],
       ['b', '%m.buttons trykket?', 'isButtonPressed', 'knapp A'],
       ['-'],
@@ -757,6 +805,8 @@
       ['-'],
       [' ', 'draai %m.servos tot %n graden', 'rotateServo', 'servo A', 180],
       [' ', 'draai %m.servos met %n graden', 'changeServo', 'servo A', 20],
+      ['-'],
+      [' ', 'rotate %m.motors to %n degrees', 'rotateMotor', 'motor A', 180],
       ['-'],
       ['h', 'wanneer %m.buttons is %m.btnStates', 'whenButton', 'knop A', 'in gedrukt'],
       ['b', '%m.buttons ingedrukt?', 'isButtonPressed', 'knop A'],
@@ -787,6 +837,8 @@
       [' ', 'obróć %m.servos w położenie %n degrees', 'rotateServo', 'serwo A', 180],
       [' ', 'obróć %m.servos o %n degrees', 'changeServo', 'serwo A', 20],
       ['-'],
+      [' ', 'rotate %m.motors to %n degrees', 'rotateMotor', 'motor A', 180],
+      ['-'],
       ['h', 'kiedy %m.buttons jest %m.btnStates', 'whenButton', 'przycisk A', 'wciśnięty'],
       ['b', 'czy %m.buttons jest wciśnięty?', 'isButtonPressed', 'przycisk A'],
       ['-'],
@@ -815,6 +867,8 @@
       ['-'],
       [' ', 'girar %m.servos para %n graus', 'rotateServo', 'servo A', 180],
       [' ', 'girar %m.servos em %n graus', 'changeServo', 'servo A', 20],
+      ['-'],
+      [' ', 'rotate %m.motors to %n degrees', 'rotateMotor', 'motor A', 180],
       ['-'],
       ['h', 'quando %m.buttons is %m.btnStates', 'whenButton', 'botao A', 'pressionado'],
       ['b', '%m.buttons pressionado?', 'isButtonPressed', 'botao A'],
@@ -845,6 +899,8 @@
       [' ', 'установить %m.servos в позицию %n °', 'rotateServo', 'серво A', 180],
       [' ', 'повернуть %m.servos на %n °', 'changeServo', 'серво A', 20],
       ['-'],
+      [' ', 'rotate %m.motors to %n degrees', 'rotateMotor', 'motor A', 180],
+      ['-'],
       ['h', 'когда %m.buttons %m.btnStates', 'whenButton', 'кнопка A', 'нажата'],
       ['b', '%m.buttons нажата?', 'isButtonPressed', 'кнопка A'],
       ['-'],
@@ -873,6 +929,8 @@
       ['-'],
       [' ', 'στρίψε το %m.servos στις %n μοίρες', 'rotateServo', 'servo A', 180],
       [' ', 'στρίψε το %m.servos κατά %n μοίρες', 'changeServo', 'servo A', 20],
+      ['-'],
+      [' ', 'rotate %m.motors to %n degrees', 'rotateMotor', 'motor A', 180],
       ['-'],
       ['h', 'Όταν το %m.buttons είναι %m.btnStates', 'whenButton', 'κουμπί A', 'πατημένο'],
       ['b', 'το %m.buttons πατήθηκε;', 'isButtonPressed', 'κουμπί A'],
@@ -903,6 +961,8 @@
       [' ', 'apuntar %m.servos en dirección %n grados', 'rotateServo', 'servo A', 180],
       [' ', 'girar %m.servos %n grados', 'changeServo', 'servo A', 20],
       ['-'],
+      [' ', 'rotate %m.motors to %n degrees', 'rotateMotor', 'motor A', 180],
+      ['-'],
       ['h', 'cuando el %m.buttons esté %m.btnStates', 'whenButton', 'botón A', 'presionado'],
       ['b', '¿%m.buttons presionado?', 'isButtonPressed', 'botón A'],
       ['-'],
@@ -932,6 +992,8 @@
       [' ', '旋轉 %m.servos 到 %n 度', 'rotateServo', '伺服馬達 A', 180],
       [' ', '旋轉 %m.servos %n 度', 'changeServo', '伺服馬達 A', 20],
       ['-'],
+      [' ', 'rotate %m.motors to %n degrees', 'rotateMotor', 'motor A', 180],
+      ['-'],
       ['h', '當 %m.buttons 為 %m.btnStates', 'whenButton', '按鈕 A', '按下'],
       ['b', '%m.buttons 按下?', 'isButtonPressed', '按鈕 A'],
       ['-'],
@@ -956,140 +1018,154 @@
       buttons: ['button A', 'button B', 'button C', 'button D'],
       btnStates: ['pressed', 'released'],
       hwIn: ['rotation knob', 'light sensor', 'temperature sensor'],
-      hwOut: ['led A', 'led B', 'led C', 'led D', 'button A', 'button B', 'button C', 'button D', 'servo A', 'servo B', 'servo C', 'servo D'],
+      hwOut: ['led A', 'led B', 'led C', 'led D', 'button A', 'button B', 'button C', 'button D', 'servo A', 'servo B', 'servo C', 'servo D', 'motor A'],
       leds: ['led A', 'led B', 'led C', 'led D'],
       outputs: ['on', 'off'],
       ops: ['>', '=', '<'],
+      motors: ['motor A'],
       servos: ['servo A', 'servo B', 'servo C', 'servo D']
     },
     de: {
       buttons: ['Taste A', 'Taste B', 'Taste C', 'Taste D'],
       btnStates: ['gedrückt', 'losgelassen'],
       hwIn: ['Drehknopf', 'Lichtsensor', 'Temperatursensor'],
-      hwOut: ['LED A', 'LED B', 'LED C', 'LED D', 'Taste A', 'Taste B', 'Taste C', 'Taste D', 'Servo A', 'Servo B', 'Servo C', 'Servo D'],
+      hwOut: ['LED A', 'LED B', 'LED C', 'LED D', 'Taste A', 'Taste B', 'Taste C', 'Taste D', 'Servo A', 'Servo B', 'Servo C', 'Servo D', 'motor A'],
       leds: ['LED A', 'LED B', 'LED C', 'LED D'],
       outputs: ['Ein', 'Aus'],
       ops: ['>', '=', '<'],
+      motors: ['motor A'],
       servos: ['Servo A', 'Servo B', 'Servo C', 'Servo D']
     },
     fr: {
       buttons: ['Bouton A', 'Bouton B', 'Bouton C', 'Bouton D'],
       btnStates: ['Appuyé', 'Relâché'],
       hwIn: ['Potentiomètre', 'Capteur de Lumière', 'Capteur de Temperature'],
-      hwOut: ['LED A', 'LED B', 'LED C', 'LED D', 'Bouton A', 'Bouton B', 'Bouton C', 'Bouton D', 'Servo Moteur A', 'Servo Moteur B', 'Servo Moteur C', 'Servo Moteur D'],
+      hwOut: ['LED A', 'LED B', 'LED C', 'LED D', 'Bouton A', 'Bouton B', 'Bouton C', 'Bouton D', 'Servo Moteur A', 'Servo Moteur B', 'Servo Moteur C', 'Servo Moteur D', 'motor A'],
       leds: ['LED A', 'LED B', 'LED C', 'LED D'],
       outputs: ['ON', 'OFF'],
       ops: ['>', '=', '<'],
+      motors: ['motor A'],
       servos: ['Servo Moteur A', 'Servo Moteur B', 'Servo Moteur C', 'Servo Moteur D']
     },
     it: {
       buttons: ['pulsante A', 'pulsante B', 'pulsante C', 'pulsante D'],
       btnStates: ['premuto', 'rilasciato'],
       hwIn: ['potenziometro', 'sensore di luce', 'sensore di temperatura'],
-      hwOut: ['led A', 'led B', 'led C', 'led D', 'pulsante A', 'pulsante B', 'pulsante C', 'pulsante D', 'servo A', 'servo B', 'servo C', 'servo D'],
+      hwOut: ['led A', 'led B', 'led C', 'led D', 'pulsante A', 'pulsante B', 'pulsante C', 'pulsante D', 'servo A', 'servo B', 'servo C', 'servo D', 'motor A'],
       leds: ['led A', 'led B', 'led C', 'led D'],
       outputs: ['acceso', 'spento'],
       ops: ['>', '=', '<'],
+      motors: ['motor A'],
       servos: ['servo A', 'servo B', 'servo C', 'servo D']
     },
     ja: {
       buttons: ['ボタン A', 'ボタン B', 'ボタン C', 'ボタン D'],
       btnStates: ['押された', '放された'],
       hwIn: ['回転つまみ', '光センサー', '温度センサー'],
-      hwOut: ['led A', 'led B', 'led C', 'led D', 'ボタン A', 'ボタン B', 'ボタン C', 'ボタン D', 'サーボ A', 'サーボ B', 'サーボ C', 'サーボ D'],
+      hwOut: ['led A', 'led B', 'led C', 'led D', 'ボタン A', 'ボタン B', 'ボタン C', 'ボタン D', 'サーボ A', 'サーボ B', 'サーボ C', 'サーボ D', 'motor A'],
       leds: ['led A', 'led B', 'led C', 'led D'],
       outputs: ['オン', 'オフ'],
       ops: ['>', '=', '<'],
+      motors: ['motor A'],
       servos: ['サーボ A', 'サーボ B', 'サーボ C', 'サーボ D']
     },
     ko: {
       buttons: ['버튼 A', '버튼 B', '버튼 C', '버튼 D'],
       btnStates: ['눌림', '떼짐'],
       hwIn: ['회전 손잡이', '조도 센서', '온도 센서'],
-      hwOut: ['led A', 'led B', 'led C', 'led D', '버튼 A', '버튼 B', '버튼 C', '버튼 D', '서보모터 A', '서보모터 B', '서보모터 C', '서보모터 D'],
+      hwOut: ['led A', 'led B', 'led C', 'led D', '버튼 A', '버튼 B', '버튼 C', '버튼 D', '서보모터 A', '서보모터 B', '서보모터 C', '서보모터 D', 'motor A'],
       leds: ['led A', 'led B', 'led C', 'led D'],
       outputs: ['켜기', '끄기'],
       ops: ['>', '=', '<'],
+      motors: ['motor A'],
       servos: ['서보모터 A', '서보모터 B', '서보모터 C', '서보모터 D']
     },
     nb: {
       buttons: ['knapp A', 'knapp B', 'knapp C', 'knapp D'],
       btnStates: ['trykkes', 'slippes'],
       hwIn: ['dreieknapp', 'lyssensor', 'temperatursensor'],
-      hwOut: ['LED A', 'LED B', 'LED C', 'LED D', 'knapp A', 'knapp B', 'knapp C', 'knapp D', 'servo A', 'servo B', 'servo C', 'servo D'],
+      hwOut: ['LED A', 'LED B', 'LED C', 'LED D', 'knapp A', 'knapp B', 'knapp C', 'knapp D', 'servo A', 'servo B', 'servo C', 'servo D', 'motor A'],
       leds: ['LED A', 'LED B', 'LED C', 'LED D'],
       outputs: ['på', 'av'],
       ops: ['>', '=', '<'],
+      motors: ['motor A'],
       servos: ['servo A', 'servo B', 'servo C', 'servo D']
     },
     nl: {
       buttons: ['knop A', 'knop B', 'knop C', 'knop D'],
       btnStates: ['ingedrukt', 'losgelaten'],
       hwIn: ['draaiknop', 'licht sensor', 'temperatuur sensor'],
-      hwOut: ['led A', 'led B', 'led C', 'led D', 'knop A', 'knop B', 'knop C', 'knop D', 'servo A', 'servo B', 'servo C', 'servo D'],
+      hwOut: ['led A', 'led B', 'led C', 'led D', 'knop A', 'knop B', 'knop C', 'knop D', 'servo A', 'servo B', 'servo C', 'servo D', 'motor A'],
       leds: ['led A', 'led B', 'led C', 'led D'],
       outputs: ['aan', 'uit'],
       ops: ['>', '=', '<'],
+      motors: ['motor A'],
       servos: ['servo A', 'servo B', 'servo C', 'servo D']
     },
     pl: {
       buttons: ['przycisk A', 'przycisk B', 'przycisk C', 'przycisk D'],
       btnStates: ['wciśnięty', 'zwolniony'],
       hwIn: ['pokrętło', 'czujnik światła', 'czujnik temperatury'],
-      hwOut: ['led A', 'led B', 'led C', 'led D', 'przycisk A', 'przycisk B', 'przycisk C', 'przycisk D', 'serwo A', 'serwo B', 'serwo C', 'serwo D'],
+      hwOut: ['led A', 'led B', 'led C', 'led D', 'przycisk A', 'przycisk B', 'przycisk C', 'przycisk D', 'serwo A', 'serwo B', 'serwo C', 'serwo D', 'motor A'],
       leds: ['led A', 'led B', 'led C', 'led D'],
       outputs: ['włączony', 'wyłączony'],
       ops: ['>', '=', '<'],
+      motors: ['motor A'],
       servos: ['serwo A', 'serwo B', 'serwo C', 'serwo D']
     },
     pt: {
       buttons: ['botao A', 'botao B', 'botao C', 'botao D'],
       btnStates: ['pressionado', 'solto'],
       hwIn: ['potenciometro', 'sensor de luz', 'sensor de temperatura'],
-      hwOut: ['led A', 'led B', 'led C', 'led D', 'botao A', 'botao B', 'botao C', 'botao D', 'servo A', 'servo B', 'servo C', 'servo D'],
+      hwOut: ['led A', 'led B', 'led C', 'led D', 'botao A', 'botao B', 'botao C', 'botao D', 'servo A', 'servo B', 'servo C', 'servo D', 'motor A'],
       leds: ['led A', 'led B', 'led C', 'led D'],
       outputs: ['ligado', 'desligado'],
       ops: ['>', '=', '<'],
+      motors: ['motor A'],
       servos: ['servo A', 'servo B', 'servo C', 'servo D']
     },
     ru: {
       buttons: ['кнопка A', 'кнопка B', 'кнопка C', 'кнопка D'],
       btnStates: ['нажата', 'отпущена'],
       hwIn: ['потенциометр', 'датчик света', 'датчик температуры'],
-      hwOut: ['светодиод A', 'светодиод B', 'светодиод C', 'светодиод D', 'кнопка A', 'кнопка B', 'кнопка C', 'кнопка D', 'серво A', 'серво B', 'серво C', 'серво D'],
+      hwOut: ['светодиод A', 'светодиод B', 'светодиод C', 'светодиод D', 'кнопка A', 'кнопка B', 'кнопка C', 'кнопка D', 'серво A', 'серво B', 'серво C', 'серво D', 'motor A'],
       leds: ['светодиод A', 'светодиод B', 'светодиод C', 'светодиод D'],
       outputs: ['включен', 'выключен'],
       ops: ['>', '=', '<'],
+      motors: ['motor A'],
       servos: ['серво A', 'серво B', 'серво C', 'серво D']
     },
     el: {
       buttons: ['κουμπί A', 'κουμπί B', 'κουμπί C', 'κουμπί D'],
       btnStates: ['πατημένο', 'ελεύθερο'],
       hwIn: ['ποντεσιόμετρο', 'φωτοαισθητήρα', 'θερμοαισθητήρα'],
-      hwOut: ['led A', 'led B', 'led C', 'led D', 'κουμπί A', 'κουμπί B', 'κουμπί C', 'κουμπί D', 'servo A', 'servo B', 'servo C', 'servo D'],
+      hwOut: ['led A', 'led B', 'led C', 'led D', 'κουμπί A', 'κουμπί B', 'κουμπί C', 'κουμπί D', 'servo A', 'servo B', 'servo C', 'servo D', 'motor A'],
       leds: ['led A', 'led B', 'led C', 'led D'],
       outputs: ['ενεργοποιημένο', 'απενεργοποιημένο'],
       ops: ['>', '=', '<'],
+      motors: ['motor A'],
       servos: ['servo A', 'servo B', 'servo C', 'servo D']
     },
     es: {
       buttons: ['botón A', 'botón B', 'botón C', 'botón D'],
       btnStates: ['pulsado', 'liberado'],
       hwIn: ['potenciómetro', 'sensor de luz', 'sensor de temperatura'],
-      hwOut: ['led A', 'led B', 'led C', 'led D', 'botón A', 'botón B', 'botón C', 'botón D', 'servo A', 'servo B', 'servo C', 'servo D'],
+      hwOut: ['led A', 'led B', 'led C', 'led D', 'botón A', 'botón B', 'botón C', 'botón D', 'servo A', 'servo B', 'servo C', 'servo D', 'motor A'],
       leds: ['led A', 'led B', 'led C', 'led D'],
       outputs: ['on', 'off'],
       ops: ['>', '=', '<'],
+      motors: ['motor A'],
       servos: ['servo A', 'servo B', 'servo C', 'servo D']
     },
     zh: {
       buttons: ['按鈕 A', '按鈕 B', '按鈕 C', '按鈕 D'],
       btnStates: ['按下', '放開'],
       hwIn: ['旋鈕', '光感應器', '溫度感應器'],
-      hwOut: ['發光二極體 A', '發光二極體 B', '發光二極體 C', '發光二極體 D', '按鈕 A', '按鈕 B', '按鈕 C', '按鈕 D', '伺服馬達 A', '伺服馬達 B', '伺服馬達 C', '伺服馬達 D'],
+      hwOut: ['發光二極體 A', '發光二極體 B', '發光二極體 C', '發光二極體 D', '按鈕 A', '按鈕 B', '按鈕 C', '按鈕 D', '伺服馬達 A', '伺服馬達 B', '伺服馬達 C', '伺服馬達 D', 'motor A'],
       leds: ['發光二極體 A', '發光二極體 B', '發光二極體 C', '發光二極體 D'],
       outputs: ['開', '關'],
       ops: ['>', '=', '<'],
+      motors: ['motor A'],
       servos: ['伺服馬達 A', '伺服馬達 B', '伺服馬達 C', '伺服馬達 D']
     }
   };
